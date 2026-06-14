@@ -8,7 +8,7 @@ if [ ! -d ".git" ]; then
 fi
 
 HOOK_PATH=".git/hooks/pre-commit"
-RAW_URL="https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/pre-commit"
+RAW_URL="https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/hooks/pre-commit"
 
 echo "download pre commit script"
 curl -sSfL "$RAW_URL" -o "$HOOK_PATH"
