@@ -47,8 +47,8 @@ running gitleaks
     ○ ░
     ░    gitleaks
 
-Finding:     ...s.Getenv("TELE_TOKEN=8705480103:AAHhv9qNsB3yQX3bJElkEoZmEmgpTRxPzgM"
-Secret:      8705480103:AAHhv9qNsB3yQX3bJElkEoZmEmgpTRxPzgM
+Finding:     ...s.Getenv("TELE_TOKEN=870548010......."
+Secret:      870548010.......
 RuleID:      telegram-bot-api-token
 Entropy:     5.039547
 File:        cmd/kbot.go
