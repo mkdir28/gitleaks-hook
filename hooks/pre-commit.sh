@@ -2,13 +2,13 @@
 
 ENABLE=$(git config --bool hooks.enable)
 if [ "$ENABLE" == "false" ]; then
-    echo "No gitleaks"
+    echo "gitleaks disabled"
     exit 0
 fi 
 
 GITLEAKS_VERS="8.18.2"
-GITLEAKS_DIR=""
-GITLEAKS_BIN=""
+GITLEAKS_DIR=".git/hooks"
+GITLEAKS_BIN="${GITLEAKS_DIR}/gitleaks-bin"
 
 if command -v gitleaks &> /dev/null; then
     GITLEAKS_CMD="gitleaks"
