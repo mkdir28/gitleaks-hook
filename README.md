@@ -8,6 +8,12 @@ An automated Git pre-commit hook designed to prevent hardcoded secrets (API keys
 - **Local Isolation:** The binary is downloaded directly into the project's `.git/hooks/` directory. It does not clutter your global system or require `sudo` privileges.
 - **Git Config Integration:** Enable or disable the security check on the fly using standard Git configuration.
 
+## What the installation script `setup.sh` does under the hood:
+- **Verifies Environment:** Checks that you are executing the command from the root of a valid Git repository.
+- **Downloads the Hook:** Fetches the pre-commit script from this repository and places it directly into your local .git/hooks/pre-commit directory.
+- **Grants Permissions**: Automatically makes the hook executable by running `chmod +x`.
+- **Activates the Config**: Runs `git config hooks.enable true` to enable the security check by default.
+
 ---
 
 ## Installation
@@ -18,8 +24,40 @@ To install and set up the pre-commit hook in your local repository, run the foll
 curl -sSfL [https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/setup.sh](https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/setup.sh) | sh
 ```
 
-## What the installation script `setup.sh` does under the hood:
-- **Verifies Environment:** Checks that you are executing the command from the root of a valid Git repository.
-- **Downloads the Hook:** Fetches the pre-commit script from this repository and places it directly into your local .git/hooks/pre-commit directory.
-- **Grants Permissions**: Automatically makes the hook executable by running `chmod +x`.
-- **Activates the Config**: Runs `git config hooks.enable true` to enable the security check by default.
+## Demo
+
+Here's what the process looks like to install the hook and automatically block the commit when attempting to add a secret token to the repository:
+
+```console
+@mkdir28 ➜ /workspaces/kbot (main) $ curl -sSfL [https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/setup.sh](https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/setup.sh) | sh
+starting gitleaks hook installation
+download pre commit script
+success
+pre commit hook is installed and enabled
+
+@mkdir28 ➜ /workspaces/kbot (main) $ git add .
+@mkdir28 ➜ /workspaces/kbot (main) $ git commit -m "update"
+gitleaks not found. auto installation started.
+gitleaks installed to .git/hooks
+running gitleaks
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+Finding:     ...s.Getenv("TELE_TOKEN=8705480103:AAHhv9qNsB3yQX3bJElkEoZmEmgpTRxPzgM"
+Secret:      8705480103:AAHhv9qNsB3yQX3bJElkEoZmEmgpTRxPzgM
+RuleID:      telegram-bot-api-token
+Entropy:     5.039547
+File:        cmd/kbot.go
+Line:        19
+Fingerprint: cmd/kbot.go:telegram-bot-api-token:19
+
+2:43PM INF 1 commits scanned.
+2:43PM INF scan completed in 5.74ms
+2:43PM WRN leaks found: 1
+Error
+remove secrets
+```
