@@ -15,7 +15,7 @@ An automated Git pre-commit hook designed to prevent hardcoded secrets (API keys
 To install and set up the pre-commit hook in your local repository, run the following command from the **root directory** of your project:
 
 ```bash
-curl -sSfL [https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/install.sh](https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/install.sh) | sh
+curl -sSfL [https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/install.sh](https://raw.githubusercontent.com/mkdir28/gitleaks-hook/main/setup.sh) | sh
 ```
 
 ## What the installation script `setup.sh` does under the hood:
