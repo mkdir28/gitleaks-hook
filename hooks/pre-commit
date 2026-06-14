@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+ENABLE=$(git config --bool hooks.enable)
+if [ "$ENABLE" == "false" ]; then
+    echo "No gitleaks"
+    exit 0
+fi 
+
+GITLEAKS_VERS="8.18.2"
+GITLEAKS_DIR=""
+GITLEAKS_BIN=""
+
+if command -v gitleaks &> /dev/null; then
+    GITLEAKS_CMD="gitleaks"
+elif [ -f "$GITLEAKS_BIN" ]; then
+    GITLEAKS_CMD="$GITLEAKS_BIN"
+elif [ -f "${GITLEAKS_BIN}.exe" ]; then
+    GITLEAKS_CMD="${GITLEAKS_BIN}.exe"
+else
+    echo "gitleaks not found. auto installation started."
+    mkdir -p "$GITLEAKS_DIR"
+
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+
+    case "$ARCH" in
+        x86_64|amd64) ARCH="x64" ;;
+        arm64|aarch64) ARCH="arm64" ;;
+        *) echo "unknown architecture $ARCH"; exit 1 ;;
+    esac
+
+    if [[ "$OS" == *"darwin"* ]]; then
+        OS="darwin"
+    elif [[ "$OS" == *"mingw"* || "$OS" == *"msys"* ]]; then
+        OS="windows"
+    fi
+
+    if [ "$OS" == "windows" ]; then
+        URL="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERS}/gitleaks_${GITLEAKS_VERS}_${OS}_${ARCH}.zip"
+        curl -sSfL -o gitleaks.zip "$URL"
+        unzip -q gitleaks.zip gitleaks.exe
+        mv gitleaks.exe "${GITLEAKS_BIN}.exe"
+        rm gitleaks.zip
+        GITLEAKS_CMD="${GITLEAKS_BIN}.exe"
+    else
+        URL="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERS}/gitleaks_${GITLEAKS_VERS}_${OS}_${ARCH}.tar.gz"
+        curl -sSfL -o gitleaks.tar.gz "$URL"
+        tar -xzf gitleaks.tar.gz gitleaks
+        mv gitleaks "$GITLEAKS_BIN"
+        rm gitleaks.tar.gz
+        GITLEAKS_CMD="$GITLEAKS_BIN"
+    fi
+    
+    chmod +x "$GITLEAKS_CMD"
+    echo "gitleaks installed to $GITLEAKS_DIR"
+fi
+
+echo "running gitleasks"
+$GITLEAKS_CMD protect --staged -v
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Error"
+    echo "remove secrets"
+    exit 1
+fi
+
+echo "Success"
+echo "no secrets found"
+
+exit 0
